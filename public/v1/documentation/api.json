@@ -592,7 +592,7 @@
     "CreateUser": {
       "type": "object",
       "properties": {
-        "unique_key | email | phone": {
+        "unique_key | Email | Spitzname": {
           "type": "string",
           "example": "8885678345"
         },
@@ -615,7 +615,7 @@
         },
         "token": {
           "type": "string",
-          "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ...",
+          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ...",
           "description": "Authentication token"
         }
       }
@@ -629,7 +629,7 @@
         },
         "token": {
           "type": "string",
-          "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ...",
+          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ...",
           "description": "Authentication token"
         }
       }

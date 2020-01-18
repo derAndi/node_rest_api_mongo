@@ -1,14 +1,14 @@
-const { User } 	    = require('../models');
+const { Player } 	    = require('../models');
 const validator     = require('validator');
 const { to, TE }    = require('../services/util.service');
 
-const getUniqueKeyFromBody = function(body){// this is so they can send in 3 options unique_key, email, or phone and it will work
+const getUniqueKeyFromBody = function(body){// this is so they can send in 3 options unique_key, email, or playername and it will work
     let unique_key = body.unique_key;
     if(typeof unique_key==='undefined'){
-        if(typeof body.email != 'undefined'){
-            unique_key = body.email
-        }else if(typeof body.phone != 'undefined'){
-            unique_key = body.phone
+        if(typeof body.Email != 'undefined'){
+            unique_key = body.Email
+        }else if(typeof body.Spitzname != 'undefined'){
+            unique_key = body.Spitzname
         }else{
             unique_key = null;
         }
@@ -18,73 +18,72 @@ const getUniqueKeyFromBody = function(body){// this is so they can send in 3 opt
 }
 module.exports.getUniqueKeyFromBody = getUniqueKeyFromBody;
 
-const createUser = async function(userInfo){
+const createPlayer = async function(playerInfo){
     let unique_key, auth_info, err;
 
     auth_info={}
     auth_info.status='create';
 
-    unique_key = getUniqueKeyFromBody(userInfo);
-    if(!unique_key) TE('An email or phone number was not entered.');
+    unique_key = getUniqueKeyFromBody(playerInfo);
+    if(!unique_key) TE('An email or player name was not entered.');
 
     if(validator.isEmail(unique_key)){
-        auth_info.method = 'email';
-        userInfo.email = unique_key;
+        auth_info.method = 'Email';
+        playerInfo.Email = unique_key;
 
-        [err, user] = await to(User.create(userInfo));
-        if(err) TE('user already exists with that email');
+        [err, player] = await to(Player.create(playerInfo));
+        if(err) TE('player already exists with that email' + err.message);
 
-        return user;
+        return player;
 
-    }else if(validator.isMobilePhone(unique_key, 'any')){//checks if only phone number was sent
-        auth_info.method = 'phone';
-        userInfo.phone = unique_key;
+    }else if(validator.isAlphanumeric(unique_key)){//checks if only player name was sent
+        auth_info.method = 'Spitzname';
+        playerInfo.Spitzname = unique_key;
 
-        [err, user] = await to(User.create(userInfo));
-        if(err) TE('user already exists with that phone number');
+        [err, player] = await to(Player.create(playerInfo));
+        if(err) TE('player already exists with that name');
 
-        return user;
+        return player;
     }else{
-        TE('A valid email or phone number was not entered.');
+        TE('A valid email or name was not entered.');
     }
 }
-module.exports.createUser = createUser;
+module.exports.createPlayer = createPlayer;
 
-const authUser = async function(userInfo){//returns token
+const authPlayer = async function(playerInfo){//returns token
     let unique_key;
     let auth_info = {};
     auth_info.status = 'login';
-    unique_key = getUniqueKeyFromBody(userInfo);
+    unique_key = getUniqueKeyFromBody(playerInfo);
 
-    if(!unique_key) TE('Please enter an email or phone number to login');
+    if(!unique_key) TE('Please enter an email or playername to login');
 
 
-    if(!userInfo.password) TE('Please enter a password to login');
+    if(!playerInfo.password) TE('Please enter a password to login');
 
-    let user;
+    let player;
     if(validator.isEmail(unique_key)){
-        auth_info.method='email';
+        auth_info.method='Email';
 
-        [err, user] = await to(User.findOne({email:unique_key }));
+        [err, player] = await to(Player.findOne({Email:unique_key }));
         if(err) TE(err.message);
 
-    }else if(validator.isMobilePhone(unique_key, 'any')){//checks if only phone number was sent
-        auth_info.method='phone';
+    }else if(validator.isAlphanumeric(unique_key)){//checks if only player name was sent
+        auth_info.method='Spitzname';
 
-        [err, user] = await to(User.findOne({phone:unique_key }));
+        [err, player] = await to(Player.findOne({Spitzname:unique_key }));
         if(err) TE(err.message);
 
     }else{
-        TE('A valid email or phone number was not entered');
+        TE('A valid email or player name was not entered');
     }
 
-    if(!user) TE('Not registered');
-
-    [err, user] = await to(user.comparePassword(userInfo.password));
-
+    if(!player) TE('Not registered');
+    [err, player] = await to(player.comparePassword(playerInfo.password));
+    console.log("compared");
     if(err) TE(err.message);
-
-    return user;
+    console.log("compared");
+    return player;
 
 }
-module.exports.authUser = authUser;
+module.exports.authPlayer = authPlayer;

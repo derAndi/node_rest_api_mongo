@@ -1,21 +1,16 @@
-const Company 			    = require('../models/company.model');
+const League 			    = require('../models/league.model');
 const { to, ReE, ReS } = require('../services/util.service');
 
-let company = async function (req, res, next) {
-    let company_id, err, company;
-    company_id = req.params.company_id;
+let league = async function (req, res, next) {
+    let league_id, err, league;
+    league_id = req.params.league_id;
 
-    [err, company] = await to(Company.findOne({_id:company_id}));
-    if(err) return ReE(res,"err finding company");
+    [err, league] = await to(League.findOne({_id:league_id}));
+    if(err) return ReE(res,"err finding league");
 
-    if(!company) return ReE(res, "Company not found with id: "+company_id);
-    let user, users_array;
-    user = req.user;
-    users_array = company.users.map(obj=>String(obj.user));
+    if(!league) return ReE(res, "League not found with id: "+league_id);
 
-    if(!users_array.includes(String(user._id))) return ReE(res, "User does not have permission to read app with id: "+app_id);
-
-    req.company = company;
+    req.league = league;
     next();
 }
-module.exports.company = company;
+module.exports.league = league;

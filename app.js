@@ -30,7 +30,7 @@ app.use('/v1', v1);
 
 app.use('/', function(req, res){
 	res.statusCode = 200;//send the appropriate status code
-	res.json({status:"success", message:"Mongo API", data:{}})
+	res.json({status:"success", message:"Mongo API but an old one :)", data:{}})
 });
 
 // catch 404 and forward to error handler
@@ -48,7 +48,7 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  res.json({error:err.message});
 });
 
 module.exports = app;

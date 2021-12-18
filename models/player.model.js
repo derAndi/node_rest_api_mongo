@@ -1,4 +1,5 @@
 const mongoose 			= require('mongoose');
+const Sequelize         = require('sequelize');
 const bcrypt 			= require('bcrypt');
 const bcrypt_p 			= require('bcrypt-promise');
 const jwt           	= require('jsonwebtoken');
@@ -7,27 +8,34 @@ const validate          = require('mongoose-validator');
 const {TE, to}          = require('../services/util.service');
 const CONFIG            = require('../config/config');
 
-let PlayerSchema = mongoose.Schema({
-    Vorname:      {type:String},
-    Nachname:       {type:String},
-    Spitzname:	    {type:String, maxlength:30, minlength: 3, index: true, unique: true, sparse: true//sparse is because now we have two possible unique keys that are optional
+
+class Player extends Model {}
+Player.init({
+    Vorname:      {type:Sequelize.STRING},
+    Nachname:       {type:Sequelize.STRING},
+    Spitzname:	    {type:Sequelize.STRING, maxlength:30, minlength: 3, index: true, unique: true, sparse: true//sparse is because now we have two possible unique keys that are optional
     },
-    Email: {type:String, lowercase:true, trim: true, index: true, unique: true, sparse: true,
-            validate:[validate({
+    Email: {type:Sequelize.STRING,
+        allowNull: false,
+        set(val) {
+            this.setDataValue('title', val.toUpperCase());
+        }
+        lowercase:true, trim: true, index: true, unique: true, sparse: true,
+        validate:[validate({
                 validator: 'isEmail',
                 message: 'Not a valid email.',
             }),]
     },
-    password:   {type:String},
-    role: {type: String, enum: ['player', 'admin']},
-    Geschlecht: {type: String, enum: ['männlich', 'weiblich']},
-    Verein: {type: String},
-    Geburtsjahr: {type:Number},
-    Spielstaerke: {type:Number,min:1,max:6 },
-    Heimatteam: {type: String},
-    Position: {type: String}
+    password:   {type:Sequelize.STRING},
+    role: {type: Sequelize.ENUM('player', 'admin')},
+    Geschlecht: {type: Sequelize.ENUM('männlich', 'weiblich')},
+    Verein: {type: Sequelize.STRING},
+    Geburtsjahr: {type:Sequelize.NUMBER},
+    Spielstaerke: {type:Sequelize.NUMBER},
+    Heimatteam: {type: Sequelize.STRING},
+    Position: {type: Sequelize.STRING}
 
-}, {timestamps: true});
+}, {sequelize, modelName: 'player'});
 
 /*PlayerSchema.virtual('leagues', {
     ref: 'League',

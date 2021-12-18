@@ -2,8 +2,23 @@ const fs              = require('fs');
 const path            = require('path');
 const basename        = path.basename(__filename);
 const models          = {};
+
+const Sequelize         = require('sequelize');
 const mongoose      = require('mongoose');
 const CONFIG        = require('../config/config');
+
+const sequelize = new Sequelize('derandi_stadtliga', 'root', '', {
+    host: 'localhost',
+    dialect: 'mysql'/* one of 'mysql' | 'mariadb' | 'postgres' | 'mssql' */
+});
+sequelize
+    .authenticate()
+    .then(() => {
+        console.log('Connection has been established successfully.');
+    })
+    .catch(err => {
+        console.error('Unable to connect to the database:', err);
+    });
 
 if(CONFIG.db_host != ''){
     let files = fs
